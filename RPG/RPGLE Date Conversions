@@ -1,0 +1,147 @@
+Main Built in Functions (BIF) for Date Conversions in RPGLE are %date() %char() %dec()
+
+------------------------------------------------------------------------------------------------------------------
+%date()
+To populate a date variable from something other than a literal string, you have to use the IBM-supplied %date BIF.
+If used with no parameters, %date will return the current system date.
+------------------------------------------------------------------------------------------------------------------
+%char()
+%CHAR(expression{:format}). %CHAR converts the value of the expression from graphic, UCS-2, numeric, date, time or timestamp data to type character.
+The converted value remains unchanged, but is returned in a format that is compatible with character data. 
+------------------------------------------------------------------------------------------------------------------
+%dec() The %DEC function converts a string expression to a packed decimal number, with a specified precision: %DEC(expression:digits:decimals) 
+--------------------------------------------------------------------------------------------------------------------
+
+D $char_A          S              8    inz('11/12/01')                  
+D $char_B          S             10    inz('12/02/2011')                
+D $char_C          S              8    inz('12/03/11')                  
+                                                                      
+D $date_A          S               d   inz(D'2011-12-04')               
+                                                                      
+D $num_A           S              6  0 inz(111205)                      
+D $num_B           S              7  0 inz(1111206)                     
+D $num_C           S              8  0 inz(20111207)                    
+D $num_D           S              6  0 inz(120811)                      
+D $num_E           S              8  0 inz(12092011)                    
+                                                                      
+ /free                                                                                          
+
+// character to character... 
+                                                                
+ $char_B = %char(%date($char_A:*ymd/):*usa/); // 'yy/mm/dd'     to  'mm/dd/ccyy'   
+ $char_C = %char(%date($char_A:*ymd/):*mdy/); // 'yy/mm/dd'     to  'mm/dd/yy'     
+ $char_A = %char(%date($char_B:*usa/):*ymd/); // 'mm/dd/ccyy'   to  'yy/mm/dd'     
+ $char_C = %char(%date($char_B:*usa/):*mdy/); // 'mm/dd/ccyy'   to  'mm/dd/yy'     
+ $char_A = %char(%date($char_C:*mdy/):*ymd/); // 'mm/dd/yy'     to  'yy/mm/dd'     
+ $char_B = %char(%date($char_C:*mdy/):*usa/); // 'mm/dd/yy'     to  'mm/dd/ccyy'   
+                                                                                                
+
+// character to date...
+                                                                      
+ $date_A = %date($char_A:*ymd/); // 'yy/mm/dd'     to  D'ccyy-mm-dd'  
+ $date_A = %date($char_B:*usa/); // 'mm/dd/ccyy'   to  D'ccyy-mm-dd'  
+ $date_A = %date($char_C:*mdy/); // 'mm/dd/yy'     to  D'ccyy-mm-dd'  
+                                                                                                
+
+// character to numeric... 
+                                                                  
+ $num_A = %dec(%char(%date($char_A:*ymd/):*ymd0):6:0); 
+         // 'yy/mm/dd' to yymmdd         
+ $num_B = %dec(%char(%date($char_A:*ymd/):*cymd0):7:0); 
+         // 'yy/mm/dd' to cyymmdd        
+ $num_C = %dec(%char(%date($char_A:*ymd/):*iso0):7:0); 
+         // 'yy/mm/dd' to ccyymmdd       
+ $num_D = %dec(%char(%date($char_A:*ymd/):*mdy0):7:0);       
+         // 'yy/mm/dd' to mmddyy         
+ $num_E = %dec(%char(%date($char_A:*ymd/):*usa0):7:0);       
+         // 'yy/mm/dd' to mmddyyyy       
+ $num_A = %dec(%char(%date($char_B:*usa/):*ymd0):6:0);       
+         // 'mm/dd/ccyy' to yymmdd         
+ $num_B = %dec(%char(%date($char_B:*usa/):*cymd0):7:0);      
+         // 'mm/dd/ccyy' to cyymmdd        
+ $num_C = %dec(%char(%date($char_B:*usa/):*iso0):7:0);       
+         // 'mm/dd/ccyy' to ccyymmdd         
+ $num_D = %dec(%char(%date($char_B:*usa/):*mdy0):7:0);       
+         // 'mm/dd/ccyy' to mmddyy           
+ $num_E = %dec(%char(%date($char_B:*usa/):*usa0):7:0);       
+         // 'mm/dd/ccyy' to mmddyyyy         
+ $num_A = %dec(%char(%date($char_C:*mdy/):*ymd0):6:0);       
+         // 'mm/dd/yy' to yymmdd           
+ $num_B = %dec(%char(%date($char_C:*mdy/):*cymd0):7:0);      
+         // 'mm/dd/yy' to cyymmdd          
+ $num_C = %dec(%char(%date($char_C:*mdy/):*iso0):7:0);       
+         // 'mm/dd/yy' to ccyymmdd         
+ $num_D = %dec(%char(%date($char_C:*mdy/):*mdy0):7:0);       
+         // 'mm/dd/yy' to mmddyy           
+ $num_E = %dec(%char(%date($char_C:*mdy/):*usa0):7:0);       
+         // 'mm/dd/yy' to mmddyyyy         
+                                                                                                 
+
+// date to character... 
+                                                                     
+ $char_A = %char($date_A:*ymd/);  // D'ccyy-mm-dd'  to  'yy/mm/dd'       
+ $char_B = %char($date_A:*usa/);  // D'ccyy-mm-dd'  to  'mm/dd/ccyy'     
+ $char_C = %char($date_A:*mdy/);  // D'ccyy-mm-dd'  to  'mm/dd/yy'       
+                                                                                                 
+
+// date to numeric...   
+                                                                      
+ $num_A = %dec(%char($date_A:*ymd/):6:0);  // D'ccyy-mm-dd'  to yymmdd           
+ $num_B = %dec(%char($date_A:*cymd/):7:0); // D'ccyy-mm-dd'  to  cyymmdd          
+ $num_C = %dec(%char($date_A:*iso-):8:0);  // D'ccyy-mm-dd'  to  ccyymmdd         
+ $num_D = %dec(%char($date_A:*mdy/):6:0);  // D'ccyy-mm-dd'  to  mmddyy           
+ $num_E = %dec(%char($date_A:*usa/):8:0);  // D'ccyy-mm-dd'  to  mmddccyy         
+                                                                                                 
+
+// numeric to character...
+                                                                     
+ $char_A = %char(%date($num_A:*ymd):*ymd/);  // yymmdd  to 'yy/mm/dd'       
+ $char_B = %char(%date($num_A:*ymd):*usa/);  // yymmdd  to 'mm/dd/ccyy'                                                          
+ $char_C = %char(%date($num_A:*ymd):*mdy/);  // yymmdd  to 'mm/dd/yy'    
+ $char_A = %char(%date($num_B:*cymd):*ymd/); // cyymmdd to 'yy/mm/dd'    
+ $char_B = %char(%date($num_B:*cymd):*usa/); // cyymmdd to 'mm/dd/ccyy'  
+ $char_C = %char(%date($num_B:*cymd):*mdy/); // cyymmdd to  'mm/dd/yy'    
+ $char_A = %char(%date($num_C:*iso):*ymd/);  // D'ccyy-mm-dd' to 'yy/mm/dd'    
+ $char_B = %char(%date($num_C:*iso):*usa/);  // D'ccyy-mm-dd' to 'mm/dd/ccyy'  
+ $char_C = %char(%date($num_C:*iso):*mdy/);  // D'ccyy-mm-dd' to 'mm/dd/yy'    
+ $char_A = %char(%date($num_D:*mdy):*ymd/);  // mmddyy  to 'yy/mm/dd'    
+ $char_B = %char(%date($num_D:*mdy):*usa/);  // mmddyy  to 'mm/dd/ccyy'  
+ $char_C = %char(%date($num_D:*mdy):*mdy/);  // mmddyy  to 'mm/dd/yy'    
+ $char_A = %char(%date($num_E:*usa):*ymd/);  // mmddccyy  to  'yy/mm/dd'    
+ $char_B = %char(%date($num_E:*usa):*usa/);  // mmddccyy to  'mm/dd/ccyy'  
+ $char_C = %char(%date($num_E:*usa):*mdy/);  // mmddccyy to  'mm/dd/yy'    
+                                                                                                
+
+// numeric to date...
+                                                                        
+ $date_A = %date($num_A:*ymd);      // yymmdd         to  D'ccyy-mm-dd' 
+ $date_A = %date($num_B:*cymd);     // cyymmdd        to  D'ccyy-mm-dd' 
+ $date_A = %date($num_C:*iso);      // ccyymmdd'      to  D'ccyy-mm-dd' 
+ $date_A = %date($num_D:*mdy);      // mmddyy         to  D'ccyy-mm-dd' 
+ $date_A = %date($num_E:*usa);      // mmddccyy       to  D'ccyy-mm-dd' 
+                                                                                                
+
+// numeric to numeric...
+                                                                     
+ $num_B = %dec(%char(%date($num_A:*ymd):*cymd0):7:0); // yymmdd to cyymmdd       
+ $num_C = %dec(%char(%date($num_A:*ymd):*iso0):8:0); // yymmdd to ccyymmdd      
+                                                                                                
+ $num_D = %dec(%char(%date($num_A:*ymd):*mdy0):6:0); // yymmdd to mmddyy     
+ $num_E = %dec(%char(%date($num_A:*ymd):*usa0):8:0); // yymmdd to mmddccyy   
+ $num_A = %dec(%char(%date($num_B:*cymd):*ymd0):6:0); // cyymmdd to yymmdd     
+ $num_C = %dec(%char(%date($num_B:*cymd):*iso0):8:0); // cyymmdd to ccyymmdd   
+ $num_D = %dec(%char(%date($num_B:*cymd):*mdy0):6:0); // cyymmdd to  mmddyy     
+ $num_E = %dec(%char(%date($num_B:*cymd):*usa0):8:0); // cyymmdd to  mmddccyy   
+ $num_A = %dec(%char(%date($num_C:*iso):*ymd0):6:0); // ccyymmdd to yymmdd     
+ $num_B = %dec(%char(%date($num_C:*iso):*cymd0):7:0); // ccyymmdd to cyymmdd    
+ $num_D = %dec(%char(%date($num_C:*iso):*mdy0):6:0); // ccyymmdd to mmddyy     
+ $num_E = %dec(%char(%date($num_C:*iso):*usa0):8:0); // ccyymmdd to mmddccyy   
+ $num_A = %dec(%char(%date($num_D:*mdy):*ymd0):6:0); // mmddyy to yymmdd     
+ $num_B = %dec(%char(%date($num_D:*mdy):*cymd0):7:0); // mmddyy to cyymmdd    
+ $num_C = %dec(%char(%date($num_D:*mdy):*iso0):8:0);  // mmddyy to ccyymmdd   
+ $num_E = %dec(%char(%date($num_D:*mdy):*usa0):8:0);  // mmddyy to mmddccyy   
+ $num_A = %dec(%char(%date($num_E:*usa):*ymd0):6:0);  // mmddccyy to yymmdd     
+ $num_B = %dec(%char(%date($num_E:*usa):*cymd0):7:0); // mmddccyy to cyymmdd    
+ $num_C = %dec(%char(%date($num_E:*usa):*iso0):8:0);  // mmddccyy to ccyymmdd   
+ $num_D = %dec(%char(%date($num_E:*usa):*mdy0):6:0);  // mmddccyy to mmddyy  
+
